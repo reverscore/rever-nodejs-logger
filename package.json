@@ -1,0 +1,26 @@
+{
+  "name": "rever-nodejs-logger",
+  "version": "1.0.0",
+  "description": "Logger used at Rever",
+  "main": "index.js",
+  "dependencies": {
+    "express-http-context": "^1.2.3",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "uuid": "^8.2.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reverscore/rever-nodejs-logger.git"
+  },
+  "author": "Luis Elizondo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/reverscore/rever-nodejs-logger/issues"
+  },
+  "homepage": "https://github.com/reverscore/rever-nodejs-logger#readme"
+}
