@@ -22,7 +22,8 @@ class Logger {
 
   buildMetadataConfig(metadata) {
     return Object.assign({}, metadata, {
-      service: `${metadata.service}-${metadata.environment}`,
+      service: metadata.service,
+      environment: metadata.environment,
     });
   }
 
@@ -61,7 +62,7 @@ class Logger {
     if (options && options.datadog_api_key) {
       const httpTransportOptions = {
         host: 'http-intake.logs.datadoghq.com',
-        path: `/v1/input/${options.datadog_api_key}?ddsource=nodejs&service=${_metadata.service}`,
+        path: `/v1/input/${options.datadog_api_key}?ddsource=nodejs&service=${_metadata.service}&Env=${_metadata.environment}`,
         ssl: true,
       };
 
