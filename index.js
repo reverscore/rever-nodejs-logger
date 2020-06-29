@@ -43,9 +43,11 @@ class Logger {
   }
 
   _enableConsoleTransport(options) {
-    return new transports.Console({
-      format: format.simple(),
-    });
+    if (!['test'].includes(_metadata.environment)) {
+      return new transports.Console({
+        format: format.simple(),
+      });
+    }
   }
 
   _enableFileTransport(options) {
