@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "express-http-context": "^1.2.3",
+    "lodash": "^4.17.15",
     "winston": "^3.3.3"
   },
   "devDependencies": {
