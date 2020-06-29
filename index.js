@@ -3,6 +3,7 @@ const httpContext = require('express-http-context');
 const path = require('path');
 const util = require('util');
 const { createLogger, format, transports } = require('winston');
+const _ = require('lodash');
 
 class Logger {
   constructor(metadata, options, customTransports = []) {
@@ -31,12 +32,12 @@ class Logger {
       exitOnError: false,
       format: format.json(),
       defaultMeta: metadata,
-      transports: [
+      transports: _.compact([
         this._enableConsoleTransport(options),
         this._enableDatadogTransport(options, metadata),
         this._enableFileTransport(options),
         ...customTransports,
-      ],
+      ]),
     });
   }
 
@@ -52,6 +53,8 @@ class Logger {
         filename: options.filename,
       });
     }
+
+    return null;
   }
 
   _enableDatadogTransport(options, _metadata) {
@@ -64,6 +67,8 @@ class Logger {
 
       return new transports.Http(httpTransportOptions);
     }
+
+    return null;
   }
 
   setProcess(processName) {
@@ -128,7 +133,11 @@ class Logger {
       const msg = `[${this.processName}]: ${message}`;
       const _opts = Object.assign({}, opts);
       // Adding as attributes does not enable search by attributes on datadog
-      if (logId) _opts.logId = logId;
+      if (logId) {
+        _opts.logId = logId;
+        _opts.trace_id = logId;
+      }
+
       if (userId) _opts.userId = userId;
       if (this.processName) _opts.processName = this.processName;
 
