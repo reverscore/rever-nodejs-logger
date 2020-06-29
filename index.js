@@ -59,7 +59,11 @@ class Logger {
   }
 
   _enableDatadogTransport(options, _metadata) {
-    if (options && options.datadog_api_key) {
+    if (
+      options &&
+      options.datadog_api_key &&
+      !['dev', 'test'].includes(_metadata.environment)
+    ) {
       const httpTransportOptions = {
         host: 'http-intake.logs.datadoghq.com',
         path: `/v1/input/${options.datadog_api_key}?ddsource=nodejs&service=${_metadata.service}&Env=${_metadata.environment}`,
