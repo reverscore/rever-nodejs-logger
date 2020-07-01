@@ -5,7 +5,18 @@ const util = require('util');
 const { createLogger, format, transports } = require('winston');
 const _ = require('lodash');
 
+const FORMAT_JSON = format.json();
+const FORMAT_SIMPLE = format.simple();
+
 class Logger {
+  /**
+   *
+   * @param {service: string, environment: string} metadata, can include
+   * other parameters that will be injected in every log
+   * @param {filename: string, datadog_api_key: string} options, depending on the options passed
+   * it is going to initialize a transport or not
+   * @param {*} customTransports any kind of transports from winston
+   */
   constructor(metadata, options, customTransports = []) {
     this.validateMetadata(metadata);
     const _metadata = this.buildMetadataConfig(metadata);
@@ -28,13 +39,16 @@ class Logger {
   }
 
   initializeLogger(options, metadata, customTransports) {
+    const logFormat =
+      metadata.environment === 'dev' ? FORMAT_SIMPLE : FORMAT_JSON;
+
     return createLogger({
       level: 'info',
       exitOnError: false,
-      format: format.json(),
+      format: logFormat,
       defaultMeta: metadata,
       transports: _.compact([
-        this._enableConsoleTransport(options, metadata),
+        this._enableConsoleTransport(metadata),
         this._enableDatadogTransport(options, metadata),
         this._enableFileTransport(options),
         ...customTransports,
@@ -42,18 +56,9 @@ class Logger {
     });
   }
 
-  _enableConsoleTransport(options, metadata) {
-    if (!['test', 'dev'].includes(metadata.environment)) {
-      return new transports.Console({
-        format: format.json(),
-      });
-    }
-
-    if (['dev'].includes(metadata.environment)) {
-      return new transports.Console({
-        format: format.simple(),
-      });
-    }
+  _enableConsoleTransport(metadata) {
+    if (metadata.environment === 'test') return null;
+    return new transports.Console();
   }
 
   _enableFileTransport(options) {
