@@ -34,7 +34,7 @@ class Logger {
       format: format.json(),
       defaultMeta: metadata,
       transports: _.compact([
-        this._enableConsoleTransport(options),
+        this._enableConsoleTransport(options, metadata),
         this._enableDatadogTransport(options, metadata),
         this._enableFileTransport(options),
         ...customTransports,
@@ -42,7 +42,7 @@ class Logger {
     });
   }
 
-  _enableConsoleTransport(options) {
+  _enableConsoleTransport(options, metadata) {
     if (!['test'].includes(_metadata.environment)) {
       return new transports.Console({
         format: format.simple(),
