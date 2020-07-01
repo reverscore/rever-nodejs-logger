@@ -39,8 +39,6 @@ class Logger {
   }
 
   initializeLogger(options, metadata, customTransports) {
-    if (metadata.environment === 'test') return;
-
     const logFormat =
       metadata.environment === 'dev' ? FORMAT_SIMPLE : FORMAT_JSON;
 
@@ -57,6 +55,8 @@ class Logger {
   }
 
   _enableConsoleTransport(metadata) {
+    if (metadata.environment === 'test') return;
+
     return new transports.Console();
   }
 
@@ -70,11 +70,13 @@ class Logger {
     return null;
   }
 
-  _enableDatadogTransport(options, _metadata) {
+  _enableDatadogTransport(options, metadata) {
+    if (metadata.environment === 'test') return;
+
     if (options && options.datadog_api_key) {
       const httpTransportOptions = {
         host: 'http-intake.logs.datadoghq.com',
-        path: `/v1/input/${options.datadog_api_key}?ddsource=nodejs&service=${_metadata.service}`,
+        path: `/v1/input/${options.datadog_api_key}?ddsource=nodejs&service=${metadata.service}`,
         ssl: true,
       };
 
