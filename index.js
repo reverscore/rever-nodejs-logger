@@ -51,8 +51,6 @@ class Logger {
       defaultMeta: metadata,
       transports: _.compact([
         this._enableConsoleTransport(metadata),
-        this._enableDatadogTransport(options, metadata),
-        this._enableFileTransport(options),
         ...customTransports,
       ]),
     });
