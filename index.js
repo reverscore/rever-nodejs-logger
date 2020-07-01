@@ -39,6 +39,8 @@ class Logger {
   }
 
   initializeLogger(options, metadata, customTransports) {
+    if (metadata.environment === 'test') return;
+
     const logFormat =
       metadata.environment === 'dev' ? FORMAT_SIMPLE : FORMAT_JSON;
 
@@ -57,7 +59,6 @@ class Logger {
   }
 
   _enableConsoleTransport(metadata) {
-    if (metadata.environment === 'test') return null;
     return new transports.Console();
   }
 
@@ -72,14 +73,10 @@ class Logger {
   }
 
   _enableDatadogTransport(options, _metadata) {
-    if (
-      options &&
-      options.datadog_api_key &&
-      !['dev', 'test'].includes(_metadata.environment)
-    ) {
+    if (options && options.datadog_api_key) {
       const httpTransportOptions = {
         host: 'http-intake.logs.datadoghq.com',
-        path: `/v1/input/${options.datadog_api_key}?ddsource=nodejs&service=${_metadata.service}&Env=${_metadata.environment}`,
+        path: `/v1/input/${options.datadog_api_key}?ddsource=nodejs&service=${_metadata.service}`,
         ssl: true,
       };
 
@@ -144,11 +141,7 @@ class Logger {
       const logId = this.getLogId() || null;
       const userId = this.getUserId('userId') || null;
 
-      if (!this.processName) {
-        throw new Error('No process name set on logger');
-      }
-
-      const msg = `[${this.processName}]: ${message}`;
+      const msg = `${message}`;
       const _opts = Object.assign({}, opts);
       // Adding as attributes does not enable search by attributes on datadog
       if (logId) {
@@ -157,7 +150,6 @@ class Logger {
       }
 
       if (userId) _opts.userId = userId;
-      if (this.processName) _opts.processName = this.processName;
 
       return this.logger[level](msg, _opts);
     } catch (err) {
