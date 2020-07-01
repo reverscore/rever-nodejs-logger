@@ -141,7 +141,11 @@ class Logger {
       const logId = this.getLogId() || null;
       const userId = this.getUserId('userId') || null;
 
-      const msg = `${message}`;
+      if (!this.processName) {
+        throw new Error('No process name set on logger');
+      }
+
+      const msg = `[${this.processName}]: ${message}`;
       const _opts = Object.assign({}, opts);
       // Adding as attributes does not enable search by attributes on datadog
       if (logId) {
@@ -150,6 +154,7 @@ class Logger {
       }
 
       if (userId) _opts.userId = userId;
+      if (this.processName) _opts.processName;
 
       return this.logger[level](msg, _opts);
     } catch (err) {
