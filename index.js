@@ -43,7 +43,13 @@ class Logger {
   }
 
   _enableConsoleTransport(options, metadata) {
-    if (!['test'].includes(metadata.environment)) {
+    if (!['test', 'dev'].includes(metadata.environment)) {
+      return new transports.Console({
+        format: format.json(),
+      });
+    }
+
+    if (['dev'].includes(metadata.environment)) {
       return new transports.Console({
         format: format.simple(),
       });
