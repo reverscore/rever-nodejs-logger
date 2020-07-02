@@ -4,6 +4,7 @@ const path = require('path');
 const util = require('util');
 const { createLogger, format, transports } = require('winston');
 const _ = require('lodash');
+const { createWriteStream } = require('fs');
 
 const FORMAT_JSON = format.json();
 const FORMAT_SIMPLE = format.simple();
@@ -49,6 +50,7 @@ class Logger {
       defaultMeta: metadata,
       transports: _.compact([
         this._enableConsoleTransport(metadata),
+        this._enableDevNullTransport(metadata),
         ...customTransports,
       ]),
     });
@@ -84,6 +86,14 @@ class Logger {
     }
 
     return null;
+  }
+
+  _enableDevNullTransport(metadata) {
+    if (metadata.environment === 'test') {
+      return new transports.Stream({
+        stream: createWriteStream('/dev/null'),
+      });
+    }
   }
 
   setProcess(processName) {
