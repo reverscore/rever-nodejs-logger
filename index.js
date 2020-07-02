@@ -7,7 +7,7 @@ const _ = require('lodash');
 const { createWriteStream } = require('fs');
 
 const FORMAT_JSON = format.json();
-const FORMAT_SIMPLE = format.simple();
+const FORMAT_DEV = format.cli();
 
 class Logger {
   /**
@@ -41,7 +41,7 @@ class Logger {
 
   initializeLogger(options, metadata, customTransports) {
     const logFormat =
-      metadata.environment === 'dev' ? FORMAT_SIMPLE : FORMAT_JSON;
+      metadata.environment === 'dev' ? FORMAT_DEV : FORMAT_JSON;
 
     return createLogger({
       level: 'info',
