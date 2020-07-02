@@ -172,51 +172,51 @@ class Logger {
     }
   }
 
-  i(message, opts) {
+  i(message, opts = {}) {
     this.doLog('info', message, opts);
   }
 
-  l(message, opts) {
+  l(message, opts = {}) {
     return this.i(message, opts);
   }
 
-  log(message, opts) {
+  log(message, opts = {}) {
     return this.i(message, opts);
   }
 
-  info(message, opts) {
+  info(message, opts = {}) {
     return this.i(message, opts);
   }
 
-  e(message, opts) {
+  e(message, opts = {}) {
     this.doLog('error', message, opts);
   }
 
-  error(message, opts) {
+  error(message, opts = {}) {
     return this.e(message, opts);
   }
 
-  w(message, opts) {
+  w(message, opts = {}) {
     this.doLog('warn', message, opts);
   }
 
-  warn(message, opts) {
+  warn(message, opts = {}) {
     return this.w(message, opts);
   }
 
-  warning(message, opts) {
+  warning(message, opts = {}) {
     return this.w(message, opts);
   }
 
-  d(message, opts) {
+  d(message, opts = {}) {
     this.doLog('debug', message, opts);
   }
 
-  debug(message, opts) {
+  debug(message, opts = {}) {
     return this.d(message, opts);
   }
 
-  test(message, opts) {
+  test(message, opts = {}) {
     if (opts) {
       console.log(message, opts);
     } else {
