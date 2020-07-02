@@ -156,7 +156,7 @@ class Logger {
       }
 
       const msg = `[${this.processName}]: ${message}`;
-      const _opts = Object.assign({}, opts);
+      const _opts = Object.assign({}, { metadata: opts });
       // Adding as attributes does not enable search by attributes on datadog
       if (logId) {
         _opts.logId = logId;
