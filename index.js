@@ -8,7 +8,10 @@ const { createWriteStream } = require('fs');
 
 const FORMAT_JSON = format.json();
 const FORMAT_SIMPLE = format.simple();
-const FORMAT_DEV = format.prettyPrint({ colorize: true })
+const FORMAT_DEV = format.combine(
+  format.colorize(),
+  format.simple()
+)
 
 class Logger {
   /**
