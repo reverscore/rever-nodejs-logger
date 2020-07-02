@@ -7,11 +7,7 @@ const _ = require('lodash');
 const { createWriteStream } = require('fs');
 
 const FORMAT_JSON = format.json();
-const FORMAT_SIMPLE = format.simple();
-const FORMAT_DEV = format.combine(
-  format.simple(),
-  format.colorize(),
-)
+const FORMAT_DEV = format.cli();
 
 class Logger {
   /**
