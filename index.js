@@ -7,7 +7,14 @@ const _ = require('lodash');
 const { createWriteStream } = require('fs');
 
 const FORMAT_JSON = format.json();
-const FORMAT_DEV = format.cli();
+
+const devPrinter = ({ level, message, metadata }) => {
+  const stringifiedMetadata = util.inspect(metadata)
+  if (stringifiedMetadata !== '{}') {
+    return `${level}: ${message} ${util.inspect(metadata)}` ;
+  }
+  return `${level}: ${message}` ;
+}
 
 class Logger {
   /**
@@ -39,9 +46,16 @@ class Logger {
     });
   }
 
+  getDevFormat() {
+    return format.combine(
+      format.colorize(),
+      format.printf(devPrinter)
+    );
+  }
+
   initializeLogger(options, metadata, customTransports) {
     const logFormat =
-      metadata.environment === 'dev' ? FORMAT_DEV : FORMAT_JSON;
+    metadata.environment === 'dev' ? this.getDevFormat() : FORMAT_JSON;
 
     return createLogger({
       level: 'info',
