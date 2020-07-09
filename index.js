@@ -8,12 +8,12 @@ const { createWriteStream } = require('fs');
 
 const FORMAT_JSON = format.json();
 
-const devPrinter = ({ level, message, metadata }) => {
+const devPrinter = ({ level, message, logId, metadata }) => {
   const stringifiedMetadata = util.inspect(metadata)
   if (stringifiedMetadata !== '{}') {
-    return `${level}: ${message} ${util.inspect(metadata)}` ;
+    return `${level} ${logId}: ${message} ${util.inspect(metadata)}` ;
   }
-  return `${level}: ${message}` ;
+  return `${level} ${logId}: ${message}` ;
 }
 
 class Logger {
@@ -171,7 +171,7 @@ class Logger {
 
       const msg = `[${this.processName}]: ${message}`;
       const _opts = Object.assign({}, { metadata: opts });
-      // Adding as attributes does not enable search by attributes on datadog
+
       if (logId) {
         _opts.logId = logId;
         _opts.trace_id = logId;
