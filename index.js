@@ -125,7 +125,7 @@ class Logger {
     const methodNameCapitalized =
       methodName.charAt(0).toUpperCase() + methodName.slice(1);
     this.setProcess(
-      `${this.classProcessName}) (methods:${methodNameCapitalized}`,
+      `${this.classProcessName}] [methods:${methodNameCapitalized}`,
     );
   }
 
