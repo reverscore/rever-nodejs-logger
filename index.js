@@ -2,11 +2,13 @@
 const httpContext = require('express-http-context');
 const path = require('path');
 const util = require('util');
+const { serializeError } = require('serialize-error');
 const { createLogger, format, transports } = require('winston');
 const _ = require('lodash');
 const { createWriteStream } = require('fs');
 
 const FORMAT_JSON = format.json();
+const LOCAL_DEV_ENVIRONMENT = 'DEV'
 
 const devPrinter = ({ level, message, logId, metadata }) => {
   const stringifiedMetadata = util.inspect(metadata)
@@ -160,6 +162,12 @@ class Logger {
     }
   }
 
+  parseMetadata(opts, level) {
+    const { environment } = this.logger.defaultMeta;
+    if (level !== 'error' || environment === LOCAL_DEV_ENVIRONMENT) return opts;
+    return serializeError(opts);
+  }
+
   doLog(level, message, opts) {
     try {
       const logId = this.getLogId() || null;
@@ -170,7 +178,8 @@ class Logger {
       }
 
       const msg = `[${this.processName}]: ${message}`;
-      const _opts = Object.assign({}, { metadata: opts });
+      const metadata = this.parseMetadata(opts, level)
+      const _opts = Object.assign({}, { metadata });
 
       if (logId) {
         _opts.logId = logId;
@@ -182,7 +191,7 @@ class Logger {
 
       return this.logger[level](msg, _opts);
     } catch (err) {
-      return this.logger[level](err);
+      return this.logger[level](err.message);
     }
   }
 
