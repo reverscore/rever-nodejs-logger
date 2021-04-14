@@ -245,8 +245,6 @@ class Logger {
     } else {
       console.log(message);
     }
-
-    return;
   }
 }
 

@@ -24,8 +24,7 @@ function log() {
 function catchError(message) {
   try {
     if (message.size > 5) {
-      const error = new Error('Size too big', message);
-      throw error;
+      throw new Error('Size too big', message);
     }
   } catch (error) {
     logger.error(error);
