@@ -187,7 +187,7 @@ class Logger {
       }
 
       if (userId) _opts.userId = userId;
-      if (this.processName) _opts.processName;
+      if (this.processName) _opts.processName = this.processName;
 
       return this.logger[level](msg, _opts);
     } catch (err) {
