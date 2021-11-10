@@ -183,7 +183,7 @@ class Logger {
 
       if (logId) {
         _opts.logId = logId;
-        _opts.trace_id = logId;
+        // _opts.trace_id = logId; // Commenting this line to test if datadog adds its own value
       }
 
       if (userId) _opts.userId = userId;
