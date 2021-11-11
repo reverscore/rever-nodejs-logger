@@ -181,11 +181,7 @@ class Logger {
       const metadata = this.parseMetadata(opts, level)
       const _opts = Object.assign({}, { metadata });
 
-      if (logId) {
-        _opts.logId = logId;
-        // _opts.trace_id = logId; // Commenting this line to test if datadog adds its own value
-      }
-
+      if (logId) _opts.logId = logId;
       if (userId) _opts.userId = userId;
       if (this.processName) _opts.processName = this.processName;
 
