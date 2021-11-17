@@ -67,6 +67,7 @@ class Logger {
       transports: _.compact([
         this._enableConsoleTransport(metadata),
         this._enableDevNullTransport(metadata),
+        this._enableFileTransport(options),
         ...customTransports,
       ]),
     });
@@ -82,6 +83,9 @@ class Logger {
     if (options && options.filename) {
       return new transports.File({
         filename: options.filename,
+        maxFiles: 1,
+        maxsize: 1024 * 20,
+        tailable: true,
       });
     }
 
@@ -181,7 +185,11 @@ class Logger {
       const metadata = this.parseMetadata(opts, level)
       const _opts = Object.assign({}, { metadata });
 
-      if (logId) _opts.logId = logId;
+      if (logId) {
+        _opts.logId = logId;
+        _opts.trace_id = logId;
+      }
+
       if (userId) _opts.userId = userId;
       if (this.processName) _opts.processName = this.processName;
 
