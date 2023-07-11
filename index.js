@@ -56,11 +56,12 @@ class Logger {
   }
 
   initializeLogger(options, metadata, customTransports) {
-    const logFormat =
-    metadata.environment === 'dev' ? this.getDevFormat() : FORMAT_JSON;
+    const logFormat = metadata.environment === 'dev'
+      ? this.getDevFormat()
+      : FORMAT_JSON;
 
     return createLogger({
-      level: 'info',
+      level: options?.level ?? 'info',
       exitOnError: false,
       format: logFormat,
       defaultMeta: metadata,
