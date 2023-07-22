@@ -56,7 +56,7 @@ class Logger {
   }
 
   initializeLogger(options, metadata, customTransports) {
-    const logFormat = metadata.environment === 'dev'
+    const logFormat = metadata.environment === 'dev' || metadata.environment === 'local'
       ? this.getDevFormat()
       : FORMAT_JSON;
 
