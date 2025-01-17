@@ -25,11 +25,13 @@ class Logger {
    * other parameters that will be injected in every log
    * @param {filename: string, datadog_api_key: string} options, depending on the options passed
    * it is going to initialize a transport or not
-   * @param {*} customTransports any kind of transports from winston
+   * @param {Object} [consoleTransport] any kind of transports from winston to override the default console transport
+   * @param {Array.<Object>} [customTransports] any kind of transports from winston to add
    */
-  constructor(metadata, options, customTransports = []) {
+  constructor(metadata, options, consoleTransport, customTransports = []) {
     this.validateMetadata(metadata);
     const _metadata = this.buildMetadataConfig(metadata);
+    this.consoleTransport = consoleTransport || this._enableConsoleTransport(_metadata)
     this.logger = this.initializeLogger(options, _metadata, customTransports);
   }
 
@@ -66,7 +68,7 @@ class Logger {
       format: logFormat,
       defaultMeta: metadata,
       transports: _.compact([
-        this._enableConsoleTransport(metadata),
+        this.consoleTransport,
         this._enableDevNullTransport(metadata),
         ...customTransports,
       ]),
