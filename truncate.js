@@ -9,17 +9,16 @@ const byteSize = (value) => Buffer.byteLength(JSON.stringify(value) ?? '');
 
 const truncateString = (value, max) => `${value.slice(0, max)}…[truncated ${value.length - max} chars]`;
 
-const truncateArray = (value, max) => value
-  .slice(0, max)
-  .concat([{ __truncated: true, originalLength: value.length }]);
-
 const deepTruncate = (value, maxString, maxArray) => {
   if (typeof value === 'string') {
     return value.length > maxString ? truncateString(value, maxString) : value;
   }
   if (Array.isArray(value)) {
-    const items = value.map((item) => deepTruncate(item, maxString, maxArray));
-    return items.length > maxArray ? truncateArray(items, maxArray) : items;
+    if (value.length > maxArray) {
+      const retained = value.slice(0, maxArray).map((item) => deepTruncate(item, maxString, maxArray));
+      return retained.concat([{ __truncated: true, originalLength: value.length }]);
+    }
+    return value.map((item) => deepTruncate(item, maxString, maxArray));
   }
   if (value instanceof Date) return value;
   if (value instanceof Map || value instanceof Set) return value;
@@ -47,9 +46,10 @@ const collapse = (originalJson, budget) => {
 
 const applyBudget = (metadata, budget = DEFAULT_MAX_LOG_SIZE_BYTES) => {
   try {
-    if (byteSize(metadata) <= budget) return { metadata, truncated: false };
-
     const originalJson = JSON.stringify(metadata);
+    const originalSize = Buffer.byteLength(originalJson ?? '');
+    if (originalSize <= budget) return { metadata, truncated: false };
+
     let current = deepTruncate(metadata, MAX_STRING_LENGTH, MAX_ARRAY_LENGTH);
     let maxString = MAX_STRING_LENGTH;
     let maxArray = MAX_ARRAY_LENGTH;
