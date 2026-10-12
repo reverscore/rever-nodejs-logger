@@ -49,4 +49,17 @@ describe('Logger size guardrail', function () {
     logger.e('failed', error);
     expect(records[0].logTruncated).to.equal(true);
   });
+
+  it('Should reject invalid maxLogSizeBytes values', function () {
+    [NaN, 0, -1, 1.5, Infinity, '4096', 255].forEach((value) => {
+      expect(() => buildLogger({ maxLogSizeBytes: value }), `expected ${String(value)} to throw`)
+        .to.throw(/Invalid maxLogSizeBytes/);
+    });
+  });
+
+  it('Should accept valid maxLogSizeBytes values', function () {
+    expect(() => buildLogger({ maxLogSizeBytes: 256 })).to.not.throw();
+    expect(() => buildLogger({ maxLogSizeBytes: 4096 })).to.not.throw();
+    expect(() => buildLogger({ maxLogSizeBytes: undefined })).to.not.throw();
+  });
 });

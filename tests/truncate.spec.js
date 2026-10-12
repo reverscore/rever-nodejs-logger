@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { applyBudget, DEFAULT_MAX_LOG_SIZE_BYTES } = require('../truncate');
+const { applyBudget, DEFAULT_MAX_LOG_SIZE_BYTES, MIN_MAX_LOG_SIZE_BYTES } = require('../truncate');
 
 const makeString = (length, fill = 'a') => fill.repeat(length);
 
@@ -90,5 +90,25 @@ describe('truncate.applyBudget', function () {
 
   it('Should export the 200 KiB default', function () {
     expect(DEFAULT_MAX_LOG_SIZE_BYTES).to.equal(200 * 1024);
+  });
+
+  it('Should export the supported minimum budget', function () {
+    expect(MIN_MAX_LOG_SIZE_BYTES).to.equal(256);
+  });
+
+  it('Should report truthful originalLength across progressive passes', function () {
+    const metadata = { items: Array.from({ length: 100 }, () => makeString(100)) };
+    const result = applyBudget(metadata, 512);
+    expect(result.truncated).to.equal(true);
+    const markers = result.metadata.items.filter((item) => item && item.__truncated);
+    expect(markers).to.have.lengthOf(1);
+    expect(markers[0].originalLength).to.equal(100);
+  });
+
+  it('Should report truthful truncated-char counts across progressive passes', function () {
+    const metadata = { big: makeString(10000) };
+    const result = applyBudget(metadata, 1024);
+    expect(result.truncated).to.equal(true);
+    expect(result.metadata.big).to.contain('[truncated 9488 chars]');
   });
 });

@@ -1,4 +1,5 @@
 const DEFAULT_MAX_LOG_SIZE_BYTES = 200 * 1024;
+const MIN_MAX_LOG_SIZE_BYTES = 256;
 const MAX_STRING_LENGTH = 2048;
 const MAX_ARRAY_LENGTH = 10;
 const MAX_PASSES = 3;
@@ -56,7 +57,7 @@ const applyBudget = (metadata, budget = DEFAULT_MAX_LOG_SIZE_BYTES) => {
     for (let pass = 0; pass < MAX_PASSES && byteSize(current) > budget; pass += 1) {
       maxString = Math.floor(maxString / 2);
       maxArray = Math.max(1, Math.floor(maxArray / 2));
-      current = deepTruncate(current, maxString, maxArray);
+      current = deepTruncate(metadata, maxString, maxArray);
     }
 
     if (byteSize(current) > budget) {
@@ -73,4 +74,4 @@ const applyBudget = (metadata, budget = DEFAULT_MAX_LOG_SIZE_BYTES) => {
   }
 };
 
-module.exports = { applyBudget, DEFAULT_MAX_LOG_SIZE_BYTES };
+module.exports = { applyBudget, DEFAULT_MAX_LOG_SIZE_BYTES, MIN_MAX_LOG_SIZE_BYTES };
