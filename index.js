@@ -6,6 +6,7 @@ const { serializeError } = require('serialize-error');
 const { createLogger, format, transports } = require('winston');
 const _ = require('lodash');
 const { createWriteStream } = require('fs');
+const { applyBudget, DEFAULT_MAX_LOG_SIZE_BYTES, MIN_MAX_LOG_SIZE_BYTES } = require('./truncate');
 
 const FORMAT_JSON = format.json();
 const LOCAL_DEV_ENVIRONMENT = 'DEV'
@@ -30,15 +31,26 @@ class Logger {
    */
   constructor(metadata, options, consoleTransport, customTransports = []) {
     this.validateMetadata(metadata);
+    this.validateMaxLogSizeBytes(options?.maxLogSizeBytes);
     const _metadata = this.buildMetadataConfig(metadata);
     this.consoleTransport = consoleTransport || this._enableConsoleTransport(_metadata)
     this.logger = this.initializeLogger(options, _metadata, customTransports);
+    this.maxLogSizeBytes = options?.maxLogSizeBytes ?? DEFAULT_MAX_LOG_SIZE_BYTES;
   }
 
   validateMetadata(metadata) {
     if (!metadata.service || !metadata.environment) {
       throw new Error(
         'No service or environment configured when initializing the logger class.',
+      );
+    }
+  }
+
+  validateMaxLogSizeBytes (maxLogSizeBytes) {
+    if (maxLogSizeBytes === undefined) return;
+    if (!Number.isSafeInteger(maxLogSizeBytes) || maxLogSizeBytes < MIN_MAX_LOG_SIZE_BYTES) {
+      throw new Error(
+        `Invalid maxLogSizeBytes: expected a safe integer >= ${MIN_MAX_LOG_SIZE_BYTES}, received ${String(maxLogSizeBytes)}`,
       );
     }
   }
@@ -181,9 +193,11 @@ class Logger {
       }
 
       const msg = `[${this.processName}]: ${message}`;
-      const metadata = this.parseMetadata(opts, level)
+      const parsedMetadata = this.parseMetadata(opts, level);
+      const { metadata, truncated } = applyBudget(parsedMetadata, this.maxLogSizeBytes);
       const _opts = Object.assign({}, { metadata });
 
+      if (truncated) _opts.logTruncated = true;
       if (logId) _opts.logId = logId;
       if (userId) _opts.userId = userId;
       if (this.processName) _opts.processName = this.processName;
